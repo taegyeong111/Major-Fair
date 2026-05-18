@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>통계학과 전공박람회 - 나와 닮은 선배 찾기 (KNN)</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; background: #f4f6f9; text-align: center; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .question { margin-bottom: 25px; text-align: left; }
+        .question p { font-weight: bold; margin-bottom: 8px; }
+        .options { display: flex; justify-content: space-between; }
+        button { background: #4e73df; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        #result-section { display: none; margin-top: 30px; }
+        .result-title { font-size: 24px; color: #4e73df; font-weight: bold; margin-bottom: 15px; }
+        #chart-container { width: 100%; max-width: 500px; margin: 20px auto; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📊 나와 찰떡인 통계학과 선배 찾기</h2>
+    <p style="color: #666;">KNN 알고리즘이 내 성향과 가장 가까운 선배 데이터를 매칭해줍니다!</p>
+    <hr style="border: 0.5px solid #eee; margin-bottom: 30px;">
+
+    <div id="survey-form">
+        <div class="question">
+            <p>1. 새로운 사람들과 어울리거나 단체 톡방에서 대화를 주도하는 게 편하다.</p>
+            <div class="options">
+                <span>극I (혼자가 편함)</span>
+                <input type="radio" name="q1" value="1"> 1
+                <input type="radio" name="q1" value="2"> 2
+                <input type="radio" name="q1" value="3" checked> 3
+                <input type="radio" name="q1" value="4"> 4
+                <input type="radio" name="q1" value="5"> 5
+                <span>극E (만남이 즐겁다)</span>
+            </div>
+        </div>
+        <div class="question">
+            <p>2. 무언가를 배울 때 책을 정독하기보단 일단 직접 부딪히며 실행해본다.</p>
+            <div class="options">
+                <span>이론 우선</span>
+                <input type="radio" name="q2" value="1"> 1
+                <input type="radio" name="q2" value="2"> 2
+                <input type="radio" name="q2" value="3" checked> 3
+                <input type="radio" name="q2" value="4"> 4
+                <input type="radio" name="q2" value="5"> 5
+                <span>실전/경험 우선</span>
+            </div>
+        </div>
+        <div class="question">
+            <p>3. 조별 과제나 팀 활동을 할 때, 내가 주로 총대를 매고 이끄는 편이다.</p>
+            <div class="options">
+                <span>조용한 팀원</span>
+                <input type="radio" name="q3" value="1"> 1
+                <input type="radio" name="q3" value="2"> 2
+                <input type="radio" name="q3" value="3" checked> 3
+                <input type="radio" name="q3" value="4"> 4
+                <input type="radio" name="q3" value="5"> 5
+                <span>하드캐리 조장</span>
+            </div>
+        </div>
+        <div class="question">
+            <p>4. 과제나 시험공부는 마감 직전까지 미루다가 밤샘 벼락치기로 끝낸다.</p>
+            <div class="options">
+                <span>철저한 계획형</span>
+                <input type="radio" name="q4" value="1"> 1
+                <input type="radio" name="q4" value="2"> 2
+                <input type="radio" name="q4" value="3" checked> 3
+                <input type="radio" name="q4" value="4"> 4
+                <input type="radio" name="q4" value="5"> 5
+                <span>벼락치기 아티스트</span>
+            </div>
+        </div>
+        <div class="question">
+            <p>5. 쉬는 날에는 집콕하기보다 무조건 밖으로 나가 놀거나 핫플에 가야한다.</p>
+            <div class="options">
+                <span>완벽한 집돌이</span>
+                <input type="radio" name="q5" value="1"> 1
+                <input type="radio" name="q5" value="2"> 2
+                <input type="radio" name="q5" value="3" checked> 3
+                <input type="radio" name="q5" value="4"> 4
+                <input type="radio" name="q5" value="5"> 5
+                <span>에너자이저 밖돌이</span>
+            </div>
+        </div>
+
+        <button onclick="submitSurvey()">내 결과 분석하기 🔍</button>
+    </div>
+
+    <div id="result-section">
+        <h3>당신과 가장 가까운 선배 유형은?</h3>
+        <div id="senior-result" class="result-title">분석 중...</div>
+        <p style="font-size: 14px; color:#777;">* 아래 산점도에서 당신의 위치(★)와 가장 가까운 이웃 5명을 확인해보세요!</p>
+        <div id="chart-container">
+            <canvas id="knnChart"></canvas>
+        </div>
+        <button onclick="window.location.reload()" style="background:#6c757d;">다시 테스트하기</button>
+    </div>
+</div>
+
+<script>
+let knnChart = null;
+
+function submitSurvey() {
+    const answers = [
+        parseInt(document.querySelector('input[name="q1"]:checked').value),
+        parseInt(document.querySelector('input[name="q2"]:checked').value),
+        parseInt(document.querySelector('input[name="q3"]:checked').value),
+        parseInt(document.querySelector('input[name="q4"]:checked').value),
+        parseInt(document.querySelector('input[name="q5"]:checked').value)
+    ];
+
+    fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answers: answers })
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('survey-form').style.display = 'none';
+        document.getElementById('result-section').style.display = 'block';
+        document.getElementById('senior-result').innerText = "✨ " + data.result + " ✨";
+        
+        drawChart(data.all_data, data.user_coord);
+    });
+}
+
+function drawChart(allData, userCoord) {
+    const ctx = document.getElementById('knnChart').getContext('2d');
+    
+    // 유형별 데이터 분리
+    const types = ["학생회/과대형", "대외활동/네트워커형", "도서관 지박령형", "실무 프로젝트형", "무난한 가성비형"];
+    const colors = ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#4bc0c0'];
+    
+    let datasets = types.map((type, idx) => {
+        return {
+            label: type,
+            data: allData.filter(d => d.type === type).map(d => ({x: d.x, y: d.y})),
+            backgroundColor: colors[idx],
+            pointRadius: 4
+        }
+    });
+    
+    // 유저 데이터 (별 모양 점) 추가
+    datasets.push({
+        label: '나의 위치 (◆)',
+        data: [{x: userCoord.x, y: userCoord.y}],
+        backgroundColor: '#000000',  // 눈에 잘 띄는 검은색
+        borderColor: '#000000',
+        pointRadius: 10,             // 점 크기를 12로 크게 키웁니다.
+        pointHoverRadius: 15,
+        pointStyle: 'rectRot',       // 브라우저 호환성이 좋은 다이아몬드(또는 'triangle') 모양 추천!
+        showLine: false
+    });
+
+    if(knnChart) knnChart.destroy();
+    
+    knnChart = new Chart(ctx, {
+        type: 'scatter',
+        data: { datasets: datasets },
+        options: {
+            scales: {
+                x: { title: { display: true, text: '사교성 (X1)' }, min: 1, max: 5 },
+                y: { title: { display: true, text: '실전성 (X2)' }, min: 1, max: 5 }
+            }
+        }
+    });
+}
+</script>
+</body>
+</html>
