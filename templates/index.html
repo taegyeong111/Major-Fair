@@ -3,170 +3,258 @@
 <head>
     <meta charset="UTF-8">
     <title>통계학과 전공박람회 - 나와 닮은 선배 찾기 (KNN)</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Malgun Gothic', sans-serif; background: #f4f6f9; text-align: center; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .question { margin-bottom: 25px; text-align: left; }
-        .question p { font-weight: bold; margin-bottom: 8px; }
-        .options { display: flex; justify-content: space-between; }
-        button { background: #4e73df; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 16px; }
-        #result-section { display: none; margin-top: 30px; }
-        .result-title { font-size: 24px; color: #4e73df; font-weight: bold; margin-bottom: 15px; }
-        #chart-container { width: 100%; max-width: 500px; margin: 20px auto; }
+        body { font-family: 'Malgun Gothic', sans-serif; background: #f2f5fa; color: #333; margin: 0; padding: 0; }
+        .main-container { max-width: 700px; margin: 30px auto; background: white; border-radius: 24px; box-shadow: 0 12px 30px rgba(0,0,0,0.08); padding: 35px; text-align: center; }
+        
+        /* 💡 1. 인트로(표지) 디자인 */
+        #intro-section { display: block; }
+        .cover-img-container { width: 100%; border-radius: 16px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .cover-img-container img { width: 100%; height: auto; display: block; }
+        
+        /* 💡 2. 카드형 설문 디자인 */
+        #survey-section { display: none; }
+        .question-card { display: none; background: #fff; border-radius: 15px; text-align: left; }
+        .question-card.active { display: block; }
+        .progress-bar-container { width: 100%; height: 8px; background: #e9ecef; border-radius: 4px; margin-bottom: 30px; overflow: hidden; }
+        .progress-bar { height: 100%; background: #4e73df; width: 20%; transition: width 0.3s ease; }
+        .q-text { font-size: 22px; font-weight: bold; line-height: 1.4; margin-bottom: 35px; color: #2e3d62; text-align: center; }
+        
+        /* 리커트 척도 디자인 */
+        .likert-container { background: #f8fafc; padding: 25px 20px; border-radius: 16px; margin-bottom: 35px; }
+        .likert-labels { display: flex; justify-content: space-between; font-size: 14px; color: #6c757d; font-weight: bold; margin-bottom: 15px; padding: 0 10px; }
+        .likert-options { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
+        .likert-options label { display: flex; flex-direction: column; align-items: center; font-size: 16px; font-weight: bold; color: #4e73df; cursor: pointer; }
+        .likert-options input[type="radio"] { width: 22px; height: 22px; margin-bottom: 8px; cursor: pointer; }
+
+        /* 버튼 커스텀 */
+        button.btn { color: white; border: none; padding: 15px 32px; border-radius: 12px; cursor: pointer; font-size: 18px; font-weight: bold; transition: all 0.2s; box-shadow: 0 4px 10px rgba(78, 115, 223, 0.2); }
+        .btn-start { background: #4e73df; width: 80%; }
+        .btn-start:hover { background: #2e59d9; transform: translateY(-2px); }
+        .btn-nav { background: #4e73df; }
+        .btn-prev { background: #858796; float: left; }
+        .btn-next { float: right; }
+        .btn-submit { background: #1cc88a; float: right; box-shadow: 0 4px 10px rgba(28, 200, 138, 0.2); }
+        .nav-actions { margin-top: 20px; height: 50px; }
+
+        /* 💡 3. 결과 섹션 디자인 */
+        #result-section { display: none; }
+        .result-img-container { width: 100%; border-radius: 18px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+        .result-img-container img { width: 100%; height: auto; display: block; }
+        
+        /* 💡 4. Top 5 리더보드 리스트 디자인 */
+        #top5-container { text-align: left; background: #fff; padding: 20px; border-radius: 16px; border: 1px solid #e3e6f0; margin-bottom: 20px; }
+        .top5-title { font-size: 18px; font-weight: bold; color: #2e3d62; margin-top: 0; margin-bottom: 15px; text-align: center; border-bottom: 2px solid #e3e6f0; padding-bottom: 10px; }
+        .rank-item { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 12px 18px; border-radius: 10px; margin-bottom: 10px; border-left: 6px solid #4e73df; }
+        .rank-item:last-child { margin-bottom: 0; }
+        .rank-num { font-size: 18px; font-weight: bold; width: 45px; }
+        .rank-type { flex-grow: 1; font-size: 16px; font-weight: bold; color: #333; }
+        .rank-dist { font-size: 14px; color: #858796; background: #eaecf4; padding: 5px 10px; border-radius: 8px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>📊 나와 찰떡인 통계학과 선배 찾기</h2>
-    <p style="color: #666;">KNN 알고리즘이 내 성향과 가장 가까운 선배 데이터를 매칭해줍니다!</p>
-    <hr style="border: 0.5px solid #eee; margin-bottom: 30px;">
+<div class="main-container">
 
-    <div id="survey-form">
-        <div class="question">
-            <p>1. 새로운 사람들과 어울리거나 단체 톡방에서 대화를 주도하는 게 편하다.</p>
-            <div class="options">
-                <span>극I (혼자가 편함)</span>
-                <input type="radio" name="q1" value="1"> 1
-                <input type="radio" name="q1" value="2"> 2
-                <input type="radio" name="q1" value="3" checked> 3
-                <input type="radio" name="q1" value="4"> 4
-                <input type="radio" name="q1" value="5"> 5
-                <span>극E (만남이 즐겁다)</span>
-            </div>
+    <div id="intro-section">
+        <div class="cover-img-container">
+            <img src="/static/images/표지 이미지.png" alt="5가지 타입의 대학선배">
         </div>
-        <div class="question">
-            <p>2. 무언가를 배울 때 책을 정독하기보단 일단 직접 부딪히며 실행해본다.</p>
-            <div class="options">
-                <span>이론 우선</span>
-                <input type="radio" name="q2" value="1"> 1
-                <input type="radio" name="q2" value="2"> 2
-                <input type="radio" name="q2" value="3" checked> 3
-                <input type="radio" name="q2" value="4"> 4
-                <input type="radio" name="q2" value="5"> 5
-                <span>실전/경험 우선</span>
-            </div>
-        </div>
-        <div class="question">
-            <p>3. 조별 과제나 팀 활동을 할 때, 내가 주로 총대를 매고 이끄는 편이다.</p>
-            <div class="options">
-                <span>조용한 팀원</span>
-                <input type="radio" name="q3" value="1"> 1
-                <input type="radio" name="q3" value="2"> 2
-                <input type="radio" name="q3" value="3" checked> 3
-                <input type="radio" name="q3" value="4"> 4
-                <input type="radio" name="q3" value="5"> 5
-                <span>하드캐리 조장</span>
-            </div>
-        </div>
-        <div class="question">
-            <p>4. 과제나 시험공부는 마감 직전까지 미루다가 밤샘 벼락치기로 끝낸다.</p>
-            <div class="options">
-                <span>철저한 계획형</span>
-                <input type="radio" name="q4" value="1"> 1
-                <input type="radio" name="q4" value="2"> 2
-                <input type="radio" name="q4" value="3" checked> 3
-                <input type="radio" name="q4" value="4"> 4
-                <input type="radio" name="q4" value="5"> 5
-                <span>벼락치기 아티스트</span>
-            </div>
-        </div>
-        <div class="question">
-            <p>5. 쉬는 날에는 집콕하기보다 무조건 밖으로 나가 놀거나 핫플에 가야한다.</p>
-            <div class="options">
-                <span>완벽한 집돌이</span>
-                <input type="radio" name="q5" value="1"> 1
-                <input type="radio" name="q5" value="2"> 2
-                <input type="radio" name="q5" value="3" checked> 3
-                <input type="radio" name="q5" value="4"> 4
-                <input type="radio" name="q5" value="5"> 5
-                <span>에너자이저 밖돌이</span>
-            </div>
-        </div>
+        <button class="btn btn-start" onclick="startSurvey()">나와 잘 맞는 선배 유형 찾으러 가기! 🚀</button>
+    </div>
 
-        <button onclick="submitSurvey()">내 결과 분석하기 🔍</button>
+    <div id="survey-section">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="p-bar"></div>
+        </div>
+        
+        <div id="survey-form">
+            <div class="question-card active" id="card-1">
+                <div class="q-text">Q1. 새로운 사람들과 어울리거나 단체 톡방에서 대화를 주도하는 게 편하다.</div>
+                <div class="likert-container">
+                    <div class="likert-labels"><span>극I (혼자가 편함)</span><span>극E (만남이 즐겁다)</span></div>
+                    <div class="likert-options">
+                        <label><input type="radio" name="q1" value="1">1</label>
+                        <label><input type="radio" name="q1" value="2">2</label>
+                        <label><input type="radio" name="q1" value="3" checked>3</label>
+                        <label><input type="radio" name="q1" value="4">4</label>
+                        <label><input type="radio" name="q1" value="5">5</label>
+                    </div>
+                </div>
+                <div class="nav-actions"><button class="btn btn-nav btn-next" onclick="nextCard(1)">다음 문항 ➡️</button></div>
+            </div>
+
+            <div class="question-card" id="card-2">
+                <div class="q-text">Q2. 무언가를 배울 때 책을 정독하기보단 일단 직접 부딪히며 실행해본다.</div>
+                <div class="likert-container">
+                    <div class="likert-labels"><span>이론 우선</span><span>실전/경험 우선</span></div>
+                    <div class="likert-options">
+                        <label><input type="radio" name="q2" value="1">1</label>
+                        <label><input type="radio" name="q2" value="2">2</label>
+                        <label><input type="radio" name="q2" value="3" checked>3</label>
+                        <label><input type="radio" name="q2" value="4">4</label>
+                        <label><input type="radio" name="q2" value="5">5</label>
+                    </div>
+                </div>
+                <div class="nav-actions">
+                    <button class="btn btn-nav btn-prev" onclick="prevCard(2)">⬅️ 이전</button>
+                    <button class="btn btn-nav btn-next" onclick="nextCard(2)">다음 문항 ➡️</button>
+                </div>
+            </div>
+
+            <div class="question-card" id="card-3">
+                <div class="q-text">Q3. 조별 과제나 팀 활동을 할 때, 내가 주로 총대를 매고 이끄는 편이다.</div>
+                <div class="likert-container">
+                    <div class="likert-labels"><span>조용한 팀원</span><span>하드캐리 조장</span></div>
+                    <div class="likert-options">
+                        <label><input type="radio" name="q3" value="1">1</label>
+                        <label><input type="radio" name="q3" value="2">2</label>
+                        <label><input type="radio" name="q3" value="3" checked>3</label>
+                        <label><input type="radio" name="q3" value="4">4</label>
+                        <label><input type="radio" name="q3" value="5">5</label>
+                    </div>
+                </div>
+                <div class="nav-actions">
+                    <button class="btn btn-nav btn-prev" onclick="prevCard(3)">⬅️ 이전</button>
+                    <button class="btn btn-nav btn-next" onclick="nextCard(3)">다음 문항 ➡️</button>
+                </div>
+            </div>
+
+            <div class="question-card" id="card-4">
+                <div class="q-text">Q4. 과제나 시험공부는 마감 직전까지 미루다가 밤샘 벼락치기로 끝낸다.</div>
+                <div class="likert-container">
+                    <div class="likert-labels"><span>철저한 계획형</span><span>벼락치기 아티스트</span></div>
+                    <div class="likert-options">
+                        <label><input type="radio" name="q4" value="1">1</label>
+                        <label><input type="radio" name="q4" value="2">2</label>
+                        <label><input type="radio" name="q4" value="3" checked>3</label>
+                        <label><input type="radio" name="q4" value="4">4</label>
+                        <label><input type="radio" name="q4" value="5">5</label>
+                    </div>
+                </div>
+                <div class="nav-actions">
+                    <button class="btn btn-nav btn-prev" onclick="prevCard(4)">⬅️ 이전</button>
+                    <button class="btn btn-nav btn-next" onclick="nextCard(4)">다음 문항 ➡️</button>
+                </div>
+            </div>
+
+            <div class="question-card" id="card-5">
+                <div class="q-text">Q5. 쉬는 날에는 집콕하기보다 무조건 밖으로 나가 놀거나 핫플에 가야한다.</div>
+                <div class="likert-container">
+                    <div class="likert-labels"><span>완벽한 집돌이</span><span>에너자이저 밖돌이</span></div>
+                    <div class="likert-options">
+                        <label><input type="radio" name="q5" value="1">1</label>
+                        <label><input type="radio" name="q5" value="2">2</label>
+                        <label><input type="radio" name="q5" value="3" checked>3</label>
+                        <label><input type="radio" name="q5" value="4">4</label>
+                        <label><input type="radio" name="q5" value="5">5</label>
+                    </div>
+                </div>
+                <div class="nav-actions">
+                    <button class="btn btn-nav btn-prev" onclick="prevCard(5)">⬅️ 이전</button>
+                    <button class="btn btn-submit" onclick="submitSurvey()">결과 분석하기 🔍</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="result-section">
-        <h3>당신과 가장 가까운 선배 유형은?</h3>
-        <div id="senior-result" class="result-title">분석 중...</div>
-        <p style="font-size: 14px; color:#777;">* 아래 산점도에서 당신의 위치(★)와 가장 가까운 이웃 5명을 확인해보세요!</p>
-        <div id="chart-container">
-            <canvas id="knnChart"></canvas>
+        <div class="result-img-container">
+            <img src="" id="result-senior-image" alt="매칭 선배 일러스트 카드">
         </div>
-        <button onclick="window.location.reload()" style="background:#6c757d;">다시 테스트하기</button>
+
+        <div id="top5-container">
+            <h3 class="top5-title">🎯 나와 가장 가까운 선배 Top 5 (KNN 분석)</h3>
+            <div id="top5-list-content">
+                </div>
+        </div>
+        
+        <button class="btn" onclick="window.location.reload()" style="background:#858796; margin-top: 10px; border-radius: 10px;">다시 테스트하기</button>
     </div>
 </div>
 
 <script>
-let knnChart = null;
+    function startSurvey() {
+        document.getElementById('intro-section').style.display = 'none';
+        document.getElementById('survey-section').style.display = 'block';
+        document.getElementById('p-bar').style.width = '20%';
+    }
 
-function submitSurvey() {
-    const answers = [
-        parseInt(document.querySelector('input[name="q1"]:checked').value),
-        parseInt(document.querySelector('input[name="q2"]:checked').value),
-        parseInt(document.querySelector('input[name="q3"]:checked').value),
-        parseInt(document.querySelector('input[name="q4"]:checked').value),
-        parseInt(document.querySelector('input[name="q5"]:checked').value)
-    ];
+    function nextCard(current) {
+        document.getElementById(`card-${current}`).classList.remove('active');
+        document.getElementById(`card-${current+1}`).classList.add('active');
+        document.getElementById('p-bar').style.width = (current + 1) * 20 + '%';
+    }
+    
+    function prevCard(current) {
+        document.getElementById(`card-${current}`).classList.remove('active');
+        document.getElementById(`card-${current-1}`).classList.add('active');
+        document.getElementById('p-bar').style.width = (current - 1) * 20 + '%';
+    }
 
-    fetch('/predict', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answers: answers })
-    })
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById('survey-form').style.display = 'none';
-        document.getElementById('result-section').style.display = 'block';
-        document.getElementById('senior-result').innerText = "✨ " + data.result + " ✨";
+    function submitSurvey() {
+        const answers = [
+            parseInt(document.querySelector('input[name="q1"]:checked').value),
+            parseInt(document.querySelector('input[name="q2"]:checked').value),
+            parseInt(document.querySelector('input[name="q3"]:checked').value),
+            parseInt(document.querySelector('input[name="q4"]:checked').value),
+            parseInt(document.querySelector('input[name="q5"]:checked').value)
+        ];
+
+        fetch('/predict', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ answers: answers })
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('survey-section').style.display = 'none';
+            document.getElementById('result-section').style.display = 'block';
+            
+            // 1. 대표 이미지 매핑 (가장 많이 나온 유형 or 1등)
+            let resultName = data.result;
+            let imgMappingName = resultName;
+            if(resultName.includes("학생회")) imgMappingName = "학생회 과대형";
+            else if(resultName.includes("대외활동")) imgMappingName = "대외활동 네트워커형";
+            else if(resultName.includes("도서관")) imgMappingName = "도서관 지박령형";
+            else if(resultName.includes("실무")) imgMappingName = "실무 프로젝트 형";
+            else if(resultName.includes("가성비")) imgMappingName = "무난한 가성비형";
+            document.getElementById('result-senior-image').src = `/static/images/${imgMappingName}.png`;
+            
+            // 💡 2. Top 5 리스트 렌더링 호출
+            renderTop5List(data.nearest_data);
+        });
+    }
+
+    // 💡 Top 5 리스트를 HTML로 그리는 함수
+    function renderTop5List(nearestData) {
+        const typeColors = {
+            "학생회/과대형": '#ff6384',
+            "대외활동/네트워커형": '#36a2eb',
+            "도서관 지박령형": '#cc65fe',
+            "실무 프로젝트형": '#ffce56',
+            "무난한 가성비형": '#1cc88a'
+        };
+
+        let listHtml = '';
         
-        drawChart(data.all_data, data.user_coord);
-    });
-}
+        nearestData.forEach((d, index) => {
+            const rank = index + 1;
+            // 1, 2, 3위는 이모지 추가, 그 외는 숫자
+            let rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}위`;
+            let color = typeColors[d.type] || '#4e73df';
 
-function drawChart(allData, userCoord) {
-    const ctx = document.getElementById('knnChart').getContext('2d');
-    
-    // 유형별 데이터 분리
-    const types = ["학생회/과대형", "대외활동/네트워커형", "도서관 지박령형", "실무 프로젝트형", "무난한 가성비형"];
-    const colors = ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#4bc0c0'];
-    
-    let datasets = types.map((type, idx) => {
-        return {
-            label: type,
-            data: allData.filter(d => d.type === type).map(d => ({x: d.x, y: d.y})),
-            backgroundColor: colors[idx],
-            pointRadius: 4
-        }
-    });
-    
-    // 유저 데이터 (별 모양 점) 추가
-    datasets.push({
-        label: '나의 위치 (◆)',
-        data: [{x: userCoord.x, y: userCoord.y}],
-        backgroundColor: '#000000',  // 눈에 잘 띄는 검은색
-        borderColor: '#000000',
-        pointRadius: 10,             // 점 크기를 12로 크게 키웁니다.
-        pointHoverRadius: 15,
-        pointStyle: 'rectRot',       // 브라우저 호환성이 좋은 다이아몬드(또는 'triangle') 모양 추천!
-        showLine: false
-    });
+            listHtml += `
+                <div class="rank-item" style="border-left-color: ${color};">
+                    <div class="rank-num" style="color: ${rank <= 3 ? '#e74a3b' : '#858796'};">${rankIcon}</div>
+                    <div class="rank-type">${d.type}</div>
+                    <div class="rank-dist">유클리드 거리: ${d.distance}</div>
+                </div>
+            `;
+        });
 
-    if(knnChart) knnChart.destroy();
-    
-    knnChart = new Chart(ctx, {
-        type: 'scatter',
-        data: { datasets: datasets },
-        options: {
-            scales: {
-                x: { title: { display: true, text: '사교성 (X1)' }, min: 1, max: 5 },
-                y: { title: { display: true, text: '실전성 (X2)' }, min: 1, max: 5 }
-            }
-        }
-    });
-}
+        document.getElementById('top5-list-content').innerHTML = listHtml;
+    }
 </script>
 </body>
 </html>

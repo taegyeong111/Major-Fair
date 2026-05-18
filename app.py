@@ -29,26 +29,30 @@ def home():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    data = request.json['answers'] # [q1, q2, q3, q4, q5]
+    data = request.json['answers']  # 유저의 5차원 답변 데이터 [q1, q2, q3, q4, q5]
     user_features = np.array(data).reshape(1, -1)
     
-    # 유저 데이터 스케일링 및 예측
+    # 1. 유저 데이터 스케일링 및 예측
     user_scaled = scaler.transform(user_features)
     prediction = knn.predict(user_scaled)[0]
     
-    # 시각화를 위해 기존 데이터와 유저 데이터를 2차원(X1: 사교, X2: 실전)으로 전송
-    seniors_list = []
-    for _, row in df.iterrows():
-        seniors_list.append({
+    # 💡 2. 진짜 5차원 유클리드 거리가 가장 가까운 이웃 5명의 거리(distances)와 인덱스(indices) 추출
+    distances, indices = knn.kneighbors(user_scaled, n_neighbors=5)
+    
+    nearest_seniors = []
+    for rank, (idx, dist) in enumerate(zip(indices[0], distances[0])):
+        row = df.iloc[idx]
+        nearest_seniors.append({
             'x': float(row['X1']),
             'y': float(row['X2']),
-            'type': row['type']
+            'type': row['type'],
+            'distance': round(float(dist), 2)  # 💡 유클리드 거리 수치 (소수점 둘째자리 반올림)
         })
         
     return jsonify({
         'result': prediction,
         'user_coord': {'x': float(data[0]), 'y': float(data[1])},
-        'all_data': seniors_list
+        'nearest_data': nearest_seniors  # 💡 전체 데이터 대신 딱 5명만 전송!
     })
 
 if __name__ == '__main__':
