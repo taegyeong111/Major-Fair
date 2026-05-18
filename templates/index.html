@@ -7,27 +7,23 @@
         body { font-family: 'Malgun Gothic', sans-serif; background: #f2f5fa; color: #333; margin: 0; padding: 0; }
         .main-container { max-width: 700px; margin: 30px auto; background: white; border-radius: 24px; box-shadow: 0 12px 30px rgba(0,0,0,0.08); padding: 35px; text-align: center; }
         
-        /* 💡 1. 인트로(표지) 디자인 */
         #intro-section { display: block; }
         .cover-img-container { width: 100%; border-radius: 16px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .cover-img-container img { width: 100%; height: auto; display: block; }
         
-        /* 💡 2. 카드형 설문 디자인 */
         #survey-section { display: none; }
         .question-card { display: none; background: #fff; border-radius: 15px; text-align: left; }
         .question-card.active { display: block; }
         .progress-bar-container { width: 100%; height: 8px; background: #e9ecef; border-radius: 4px; margin-bottom: 30px; overflow: hidden; }
-        .progress-bar { height: 100%; background: #4e73df; width: 20%; transition: width 0.3s ease; }
+        .progress-bar { height: 100%; background: #4e73df; width: 10%; transition: width 0.3s ease; }
         .q-text { font-size: 22px; font-weight: bold; line-height: 1.4; margin-bottom: 35px; color: #2e3d62; text-align: center; }
         
-        /* 리커트 척도 디자인 */
         .likert-container { background: #f8fafc; padding: 25px 20px; border-radius: 16px; margin-bottom: 35px; }
         .likert-labels { display: flex; justify-content: space-between; font-size: 14px; color: #6c757d; font-weight: bold; margin-bottom: 15px; padding: 0 10px; }
         .likert-options { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
         .likert-options label { display: flex; flex-direction: column; align-items: center; font-size: 16px; font-weight: bold; color: #4e73df; cursor: pointer; }
         .likert-options input[type="radio"] { width: 22px; height: 22px; margin-bottom: 8px; cursor: pointer; }
 
-        /* 버튼 커스텀 */
         button.btn { color: white; border: none; padding: 15px 32px; border-radius: 12px; cursor: pointer; font-size: 18px; font-weight: bold; transition: all 0.2s; box-shadow: 0 4px 10px rgba(78, 115, 223, 0.2); }
         .btn-start { background: #4e73df; width: 80%; }
         .btn-start:hover { background: #2e59d9; transform: translateY(-2px); }
@@ -37,25 +33,29 @@
         .btn-submit { background: #1cc88a; float: right; box-shadow: 0 4px 10px rgba(28, 200, 138, 0.2); }
         .nav-actions { margin-top: 20px; height: 50px; }
 
-        /* 💡 3. 결과 섹션 디자인 */
         #result-section { display: none; }
         .result-img-container { width: 100%; border-radius: 18px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
         .result-img-container img { width: 100%; height: auto; display: block; }
         
-        /* 💡 4. Top 5 리더보드 리스트 디자인 */
         #top5-container { text-align: left; background: #fff; padding: 20px; border-radius: 16px; border: 1px solid #e3e6f0; margin-bottom: 20px; }
         .top5-title { font-size: 18px; font-weight: bold; color: #2e3d62; margin-top: 0; margin-bottom: 15px; text-align: center; border-bottom: 2px solid #e3e6f0; padding-bottom: 10px; }
         .rank-item { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 12px 18px; border-radius: 10px; margin-bottom: 10px; border-left: 6px solid #4e73df; }
         .rank-item:last-child { margin-bottom: 0; }
         .rank-num { font-size: 18px; font-weight: bold; width: 45px; }
         .rank-type { flex-grow: 1; font-size: 16px; font-weight: bold; color: #333; }
-        .rank-dist { font-size: 14px; color: #858796; background: #eaecf4; padding: 5px 10px; border-radius: 8px; font-weight: bold; }
+        
+        .dist-info { text-align: right; }
+        .rank-dist { font-size: 12px; color: #858796; font-weight: bold; margin-bottom: 4px; }
+        .title-badge { display: inline-block; font-size: 12px; padding: 4px 8px; border-radius: 6px; font-weight: bold; color: white; }
+        .badge-perfect { background: #e74a3b; } 
+        .badge-soul { background: #f6c23e; }    
+        .badge-good { background: #1cc88a; }    
+        .badge-normal { background: #858796; }  
     </style>
 </head>
 <body>
 
 <div class="main-container">
-
     <div id="intro-section">
         <div class="cover-img-container">
             <img src="/static/images/표지 이미지.png" alt="5가지 타입의 대학선배">
@@ -85,9 +85,9 @@
             </div>
 
             <div class="question-card" id="card-2">
-                <div class="q-text">Q2. 무언가를 배울 때 책을 정독하기보단 일단 직접 부딪히며 실행해본다.</div>
+                <div class="q-text">Q2. 학기 초 개강총회나 뒷풀이 자리에 참석하게 된다면 나는?</div>
                 <div class="likert-container">
-                    <div class="likert-labels"><span>이론 우선</span><span>실전/경험 우선</span></div>
+                    <div class="likert-labels"><span>구석에서 조용히 밥만</span><span>테이블 돌아다니며 건배</span></div>
                     <div class="likert-options">
                         <label><input type="radio" name="q2" value="1">1</label>
                         <label><input type="radio" name="q2" value="2">2</label>
@@ -103,9 +103,9 @@
             </div>
 
             <div class="question-card" id="card-3">
-                <div class="q-text">Q3. 조별 과제나 팀 활동을 할 때, 내가 주로 총대를 매고 이끄는 편이다.</div>
+                <div class="q-text">Q3. 무언가를 배울 때 책을 정독하기보단 일단 직접 부딪히며 실행해본다.</div>
                 <div class="likert-container">
-                    <div class="likert-labels"><span>조용한 팀원</span><span>하드캐리 조장</span></div>
+                    <div class="likert-labels"><span>이론 우선</span><span>경험/실전 우선</span></div>
                     <div class="likert-options">
                         <label><input type="radio" name="q3" value="1">1</label>
                         <label><input type="radio" name="q3" value="2">2</label>
@@ -121,9 +121,9 @@
             </div>
 
             <div class="question-card" id="card-4">
-                <div class="q-text">Q4. 과제나 시험공부는 마감 직전까지 미루다가 밤샘 벼락치기로 끝낸다.</div>
+                <div class="q-text">Q4. 과제를 할 때 내가 가장 선호하는 진행 방식은?</div>
                 <div class="likert-container">
-                    <div class="likert-labels"><span>철저한 계획형</span><span>벼락치기 아티스트</span></div>
+                    <div class="likert-labels"><span>개념부터 완벽히 이해</span><span>일단 끄적이면서 수정</span></div>
                     <div class="likert-options">
                         <label><input type="radio" name="q4" value="1">1</label>
                         <label><input type="radio" name="q4" value="2">2</label>
@@ -139,9 +139,9 @@
             </div>
 
             <div class="question-card" id="card-5">
-                <div class="q-text">Q5. 쉬는 날에는 집콕하기보다 무조건 밖으로 나가 놀거나 핫플에 가야한다.</div>
+                <div class="q-text">Q5. 조별 과제나 팀 활동을 할 때, 내가 주로 총대를 매고 이끄는 편이다.</div>
                 <div class="likert-container">
-                    <div class="likert-labels"><span>완벽한 집돌이</span><span>에너자이저 밖돌이</span></div>
+                    <div class="likert-labels"><span>조용한 팀원</span><span>하드캐리 조장</span></div>
                     <div class="likert-options">
                         <label><input type="radio" name="q5" value="1">1</label>
                         <label><input type="radio" name="q5" value="2">2</label>
@@ -152,6 +152,96 @@
                 </div>
                 <div class="nav-actions">
                     <button class="btn btn-nav btn-prev" onclick="prevCard(5)">⬅️ 이전</button>
+                    <button class="btn btn-nav btn-next" onclick="nextCard(5)">다음 문항 ➡️</button>
+                </div>
+            </div>
+
+            <div class="question-card" id="card-6">
+                <div class="q-text">Q6. 동아리나 학회 회의 중 의견 충돌이 발생했을 때 나는?</div>
+                <div class="likert-container">
+                    <div class="likert-labels"><span>다수결/남의 의견 따름</span><span>내 의견 적극 어필/조율</span></div>
+                    <div class="likert-options">
+                        <label><input type="radio" name="q6" value="1">1</label>
+                        <label><input type="radio" name="q6" value="2">2</label>
+                        <label><input type="radio" name="q6" value="3" checked>3</label>
+                        <label><input type="radio" name="q6" value="4">4</label>
+                        <label><input type="radio" name="q6" value="5">5</label>
+                    </div>
+                </div>
+                <div class="nav-actions">
+                    <button class="btn btn-nav btn-prev" onclick="prevCard(6)">⬅️ 이전</button>
+                    <button class="btn btn-nav btn-next" onclick="nextCard(6)">다음 문항 ➡️</button>
+                </div>
+            </div>
+
+            <div class="question-card" id="card-7">
+                <div class="q-text">Q7. 과제나 시험공부는 마감 직전까지 미루다가 밤샘 벼락치기로 끝낸다.</div>
+                <div class="likert-container">
+                    <div class="likert-labels"><span>철저한 계획형</span><span>벼락치기 아티스트</span></div>
+                    <div class="likert-options">
+                        <label><input type="radio" name="q7" value="1">1</label>
+                        <label><input type="radio" name="q7" value="2">2</label>
+                        <label><input type="radio" name="q7" value="3" checked>3</label>
+                        <label><input type="radio" name="q7" value="4">4</label>
+                        <label><input type="radio" name="q7" value="5">5</label>
+                    </div>
+                </div>
+                <div class="nav-actions">
+                    <button class="btn btn-nav btn-prev" onclick="prevCard(7)">⬅️ 이전</button>
+                    <button class="btn btn-nav btn-next" onclick="nextCard(7)">다음 문항 ➡️</button>
+                </div>
+            </div>
+
+            <div class="question-card" id="card-8">
+                <div class="q-text">Q8. 방학이나 주말 일정을 짤 때 내가 선호하는 방식은?</div>
+                <div class="likert-container">
+                    <div class="likert-labels"><span>시간 단위로 촘촘하게</span><span>일단 자고 일어나서 생각</span></div>
+                    <div class="likert-options">
+                        <label><input type="radio" name="q8" value="1">1</label>
+                        <label><input type="radio" name="q8" value="2">2</label>
+                        <label><input type="radio" name="q8" value="3" checked>3</label>
+                        <label><input type="radio" name="q8" value="4">4</label>
+                        <label><input type="radio" name="q8" value="5">5</label>
+                    </div>
+                </div>
+                <div class="nav-actions">
+                    <button class="btn btn-nav btn-prev" onclick="prevCard(8)">⬅️ 이전</button>
+                    <button class="btn btn-nav btn-next" onclick="nextCard(8)">다음 문항 ➡️</button>
+                </div>
+            </div>
+
+            <div class="question-card" id="card-9">
+                <div class="q-text">Q9. 쉬는 날에는 집콕하기보다 무조건 밖으로 나가 놀거나 핫플에 가야한다.</div>
+                <div class="likert-container">
+                    <div class="likert-labels"><span>완벽한 집돌이</span><span>에너자이저 밖돌이</span></div>
+                    <div class="likert-options">
+                        <label><input type="radio" name="q9" value="1">1</label>
+                        <label><input type="radio" name="q9" value="2">2</label>
+                        <label><input type="radio" name="q9" value="3" checked>3</label>
+                        <label><input type="radio" name="q9" value="4">4</label>
+                        <label><input type="radio" name="q9" value="5">5</label>
+                    </div>
+                </div>
+                <div class="nav-actions">
+                    <button class="btn btn-nav btn-prev" onclick="prevCard(9)">⬅️ 이전</button>
+                    <button class="btn btn-nav btn-next" onclick="nextCard(9)">다음 문항 ➡️</button>
+                </div>
+            </div>
+
+            <div class="question-card" id="card-10">
+                <div class="q-text">Q10. 오후에 갑자기 3시간 우주 공강이 생겼다! 나의 선택은?</div>
+                <div class="likert-container">
+                    <div class="likert-labels"><span>조용한 곳에서 꿀잠/휴식</span><span>동기들 모아서 피방/코노</span></div>
+                    <div class="likert-options">
+                        <label><input type="radio" name="q10" value="1">1</label>
+                        <label><input type="radio" name="q10" value="2">2</label>
+                        <label><input type="radio" name="q10" value="3" checked>3</label>
+                        <label><input type="radio" name="q10" value="4">4</label>
+                        <label><input type="radio" name="q10" value="5">5</label>
+                    </div>
+                </div>
+                <div class="nav-actions">
+                    <button class="btn btn-nav btn-prev" onclick="prevCard(10)">⬅️ 이전</button>
                     <button class="btn btn-submit" onclick="submitSurvey()">결과 분석하기 🔍</button>
                 </div>
             </div>
@@ -177,28 +267,34 @@
     function startSurvey() {
         document.getElementById('intro-section').style.display = 'none';
         document.getElementById('survey-section').style.display = 'block';
-        document.getElementById('p-bar').style.width = '20%';
+        document.getElementById('p-bar').style.width = '10%'; // 10문항이라 시작을 10%로 설정
     }
 
     function nextCard(current) {
         document.getElementById(`card-${current}`).classList.remove('active');
         document.getElementById(`card-${current+1}`).classList.add('active');
-        document.getElementById('p-bar').style.width = (current + 1) * 20 + '%';
+        document.getElementById('p-bar').style.width = (current + 1) * 10 + '%';
     }
     
     function prevCard(current) {
         document.getElementById(`card-${current}`).classList.remove('active');
         document.getElementById(`card-${current-1}`).classList.add('active');
-        document.getElementById('p-bar').style.width = (current - 1) * 20 + '%';
+        document.getElementById('p-bar').style.width = (current - 1) * 10 + '%';
     }
 
     function submitSurvey() {
+        // 💡 10문항 데이터 수집으로 확장
         const answers = [
             parseInt(document.querySelector('input[name="q1"]:checked').value),
             parseInt(document.querySelector('input[name="q2"]:checked').value),
             parseInt(document.querySelector('input[name="q3"]:checked').value),
             parseInt(document.querySelector('input[name="q4"]:checked').value),
-            parseInt(document.querySelector('input[name="q5"]:checked').value)
+            parseInt(document.querySelector('input[name="q5"]:checked').value),
+            parseInt(document.querySelector('input[name="q6"]:checked').value),
+            parseInt(document.querySelector('input[name="q7"]:checked').value),
+            parseInt(document.querySelector('input[name="q8"]:checked').value),
+            parseInt(document.querySelector('input[name="q9"]:checked').value),
+            parseInt(document.querySelector('input[name="q10"]:checked').value)
         ];
 
         fetch('/predict', {
@@ -211,7 +307,6 @@
             document.getElementById('survey-section').style.display = 'none';
             document.getElementById('result-section').style.display = 'block';
             
-            // 1. 대표 이미지 매핑 (가장 많이 나온 유형 or 1등)
             let resultName = data.result;
             let imgMappingName = resultName;
             if(resultName.includes("학생회")) imgMappingName = "학생회 과대형";
@@ -219,14 +314,24 @@
             else if(resultName.includes("도서관")) imgMappingName = "도서관 지박령형";
             else if(resultName.includes("실무")) imgMappingName = "실무 프로젝트 형";
             else if(resultName.includes("가성비")) imgMappingName = "무난한 가성비형";
-            document.getElementById('result-senior-image').src = `/static/images/${imgMappingName}.png`;
             
-            // 💡 2. Top 5 리스트 렌더링 호출
+            document.getElementById('result-senior-image').src = `/static/images/${imgMappingName}.png`;
             renderTop5List(data.nearest_data);
         });
     }
 
-    // 💡 Top 5 리스트를 HTML로 그리는 함수
+    function getDistanceBadge(dist) {
+        if (dist <= 1.2) {
+            return { title: "👯 소름 돋는 도플갱어 (99%)", css: "badge-perfect" };
+        } else if (dist <= 2.2) {
+            return { title: "🤝 영혼의 단짝 (90%)", css: "badge-soul" };
+        } else if (dist <= 3.2) {
+            return { title: "👀 꽤 통하는 사이 (80%)", css: "badge-good" };
+        } else {
+            return { title: "🌱 조금 다른 매력 (50%)", css: "badge-normal" };
+        }
+    }
+
     function renderTop5List(nearestData) {
         const typeColors = {
             "학생회/과대형": '#ff6384',
@@ -240,15 +345,18 @@
         
         nearestData.forEach((d, index) => {
             const rank = index + 1;
-            // 1, 2, 3위는 이모지 추가, 그 외는 숫자
             let rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}위`;
             let color = typeColors[d.type] || '#4e73df';
+            let badgeInfo = getDistanceBadge(d.distance);
 
             listHtml += `
                 <div class="rank-item" style="border-left-color: ${color};">
                     <div class="rank-num" style="color: ${rank <= 3 ? '#e74a3b' : '#858796'};">${rankIcon}</div>
                     <div class="rank-type">${d.type}</div>
-                    <div class="rank-dist">유클리드 거리: ${d.distance}</div>
+                    <div class="dist-info">
+                        <div class="rank-dist">거리: ${d.distance}</div>
+                        <div class="title-badge ${badgeInfo.css}">${badgeInfo.title}</div>
+                    </div>
                 </div>
             `;
         });

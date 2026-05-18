@@ -28,15 +28,25 @@ def home():
     return render_template('index.html')
 
 @app.route('/predict', methods=['POST'])
+@app.route('/predict', methods=['POST'])
 def predict():
-    data = request.json['answers']  # 유저의 5차원 답변 데이터 [q1, q2, q3, q4, q5]
-    user_features = np.array(data).reshape(1, -1)
+    raw_data = request.json['answers']  # 💡 유저의 10문항 답변 데이터 (q1 ~ q10)
     
-    # 1. 유저 데이터 스케일링 및 예측
+    # 💡 10개의 답변을 성향별로 2개씩 짝지어 평균(Mean) 계산 -> 5차원 공간으로 압축!
+    x1 = (raw_data[0] + raw_data[1]) / 2.0  # 사교성 (Q1, Q2)
+    x2 = (raw_data[2] + raw_data[3]) / 2.0  # 실전성 (Q3, Q4)
+    x3 = (raw_data[4] + raw_data[5]) / 2.0  # 리더십 (Q5, Q6)
+    x4 = (raw_data[6] + raw_data[7]) / 2.0  # 계획성 (Q7, Q8)
+    x5 = (raw_data[8] + raw_data[9]) / 2.0  # 활동성 (Q9, Q10)
+    
+    user_5d = [x1, x2, x3, x4, x5]
+    user_features = np.array(user_5d).reshape(1, -1)
+    
+    # 데이터 스케일링 및 예측
     user_scaled = scaler.transform(user_features)
     prediction = knn.predict(user_scaled)[0]
     
-    # 💡 2. 진짜 5차원 유클리드 거리가 가장 가까운 이웃 5명의 거리(distances)와 인덱스(indices) 추출
+    # 5차원 유클리드 거리가 가장 가까운 이웃 5명의 거리와 인덱스 추출
     distances, indices = knn.kneighbors(user_scaled, n_neighbors=5)
     
     nearest_seniors = []
@@ -46,13 +56,13 @@ def predict():
             'x': float(row['X1']),
             'y': float(row['X2']),
             'type': row['type'],
-            'distance': round(float(dist), 2)  # 💡 유클리드 거리 수치 (소수점 둘째자리 반올림)
+            'distance': round(float(dist), 2) 
         })
         
     return jsonify({
         'result': prediction,
-        'user_coord': {'x': float(data[0]), 'y': float(data[1])},
-        'nearest_data': nearest_seniors  # 💡 전체 데이터 대신 딱 5명만 전송!
+        'user_coord': {'x': x1, 'y': x2}, 
+        'nearest_data': nearest_seniors
     })
 
 if __name__ == '__main__':
